@@ -61,7 +61,6 @@ public class GameData : MonoBehaviour
             SaveData data = JsonUtility.FromJson<SaveData>(json);
             highScore = data.highScore;
             highScorePlayerName = data.highScorePlayerName;
-            Debug.Log("Loading! " + highScore + " " + highScorePlayerName);
         }
     }
 }
