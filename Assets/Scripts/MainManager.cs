@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using TMPro;
 
 public class MainManager : MonoBehaviour
 {
@@ -11,17 +12,48 @@ public class MainManager : MonoBehaviour
     public Rigidbody Ball;
 
     public Text ScoreText;
+    public Text highScoreText;
+    public string playerName;
     public GameObject GameOverText;
-    
+    public GameObject GameOverHighScoreText;
     private bool m_Started = false;
     private int m_Points;
     
     private bool m_GameOver = false;
 
+
+    public int highScore;
+    public string highScoreName;
     
     // Start is called before the first frame update
     void Start()
     {
+        
+        if(GameData.instance != null)
+        {
+            //set player name from main menu
+            playerName = GameData.instance.playerName;
+
+            //Load high score data
+            GameData.instance.LoadGameData();
+            highScore = GameData.instance.highScore;
+            highScoreName = GameData.instance.highScorePlayerName;
+            
+            //set score text to include player's name and 0 points.
+            ScoreText.text = $"{playerName}'s Score : {m_Points}";
+        }
+
+        //if high score data is available, display it. Otherwise, use a boilerplate.
+        if (highScoreName != "" && highScore != 0)
+        {
+            highScoreText.text = $"{highScoreName} has the high score of {highScore} points!";
+        }
+        else
+        {
+            highScoreText.text = "No one has placed a high score!";
+        }
+
+
         const float step = 0.6f;
         int perLine = Mathf.FloorToInt(4.0f / step);
         
@@ -65,12 +97,20 @@ public class MainManager : MonoBehaviour
     void AddPoint(int point)
     {
         m_Points += point;
-        ScoreText.text = $"Score : {m_Points}";
+        ScoreText.text = $"{playerName}'s Score : {m_Points}";
     }
 
     public void GameOver()
     {
         m_GameOver = true;
         GameOverText.SetActive(true);
+
+        //Save game. Check for new high score and display special text
+        GameData.instance.SaveGame(m_Points, playerName);
+        if (m_Points > GameData.instance.highScore)
+        {
+            GameOverHighScoreText.SetActive(true);
+        }
     }
+
 }
